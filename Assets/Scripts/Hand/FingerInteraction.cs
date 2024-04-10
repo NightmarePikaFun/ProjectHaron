@@ -12,6 +12,8 @@ public class FingerInteraction : MonoBehaviour
     private Vector2 stateOff;
     [SerializeField]
     private bool state = true;
+    [SerializeField]
+    private bool fingerOk = true;
 
     private GameObject observer;
     private SpriteRenderer spriteRenderer;
@@ -30,7 +32,8 @@ public class FingerInteraction : MonoBehaviour
 
     private void OnMouseDown()
     {
-        state = !state;
+        if(fingerOk)
+            state = !state;
         if (state)
         {
             transform.localPosition = stateOn;
@@ -41,6 +44,17 @@ public class FingerInteraction : MonoBehaviour
         {
             transform.localPosition = stateOff;
             spriteRenderer.sortingOrder = 3;
+        }
+        observer.GetComponent<HandHandler>().ChangeFingerState(fingerNumber);
+    }
+
+    public void WakeUpFinger()
+    {
+        if (fingerOk)
+        {
+            state = true;
+            transform.localPosition = stateOn;
+            spriteRenderer.sortingOrder = 0;
         }
         observer.GetComponent<HandHandler>().ChangeFingerState(fingerNumber);
     }

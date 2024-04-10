@@ -8,6 +8,10 @@ TagManager:
   - Boat
   - Obstacle
   - Observer
+  - HandHandler
+  - Finger
+  - Face
+  - HandUI
   layers:
   - Default
   - TransparentFX

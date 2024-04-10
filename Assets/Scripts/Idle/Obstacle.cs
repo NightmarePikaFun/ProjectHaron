@@ -9,6 +9,7 @@ public class Obstacle : MonoBehaviour
         Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Boat")
         {
+            Observer.GameSpeed = 0;
             Debug.LogWarning("Destroy boat!");
             Destroy(collision.gameObject);
         }
