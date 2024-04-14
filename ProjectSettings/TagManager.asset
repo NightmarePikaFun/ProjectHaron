@@ -12,6 +12,7 @@ TagManager:
   - Finger
   - Face
   - HandUI
+  - Talker
   layers:
   - Default
   - TransparentFX
