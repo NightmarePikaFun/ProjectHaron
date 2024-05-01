@@ -9,20 +9,25 @@ public class NPC : MonoBehaviour
     private string npcName;
     [SerializeField]
     private Text helperText;
-    [SerializeField]
-    private List<string> text;
+
     [SerializeField]
     private Sprite npcFace;
     [SerializeField]
-    private bool dialogeState = true; //true - NPC, false - player
-    [SerializeField]
-    private bool isReapiting = false;
+    private NpcTalkSystem npcTalkSystem;
 
-    private GameObject player;
+
+    private List<string> text;
     private int currentTextNumber = 0;
     private Talker talker;
     private bool inCollision = false;
+    private bool isStartDialog = true;
+    private GameObject player;
     // Start is called before the first frame update
+    private void Awake()
+    {
+        npcTalkSystem.isGifted = HaronLibrary.IsDialogUnlocked(npcTalkSystem.giftId);
+    }
+
     void Start()
     {
        talker = GameObject.FindGameObjectWithTag("Talker").GetComponent<Talker>();
@@ -33,32 +38,43 @@ public class NPC : MonoBehaviour
     {
         if(inCollision && Input.GetKeyDown(KeyCode.F))
         {
-            //TODO check start dialog
-            if (currentTextNumber < text.Count)
+            if (isStartDialog)
+                SelectText();
+            if(talker.CanWriteText())
             {
-                if(dialogeState)
+                if (currentTextNumber < text.Count)
                 {
                     talker.WriteText(text[currentTextNumber++], npcFace);
                 }
                 else
                 {
-                    string playerText = player.GetComponent<PlayerTalk>().PlayerDialogText(npcName);
-                    if (playerText != "")
-                        talker.WriteText(playerText, player.GetComponent<PlayerTalk>().GetPlayerSprite());
-                    else
-                        talker.WriteText(text[currentTextNumber++], npcFace);
+                    currentTextNumber = 0;
+                    isStartDialog = true;
+                    talker.CloseWindow();
                 }
-                dialogeState = !dialogeState; 
+            }
+        }
+    }
+
+    private void SelectText()
+    {
+        isStartDialog = false;
+        if (!npcTalkSystem.isGifted)
+        {
+            if (HaronLibrary.GiveGift(npcTalkSystem.giftId))
+            {
+                npcTalkSystem.isGifted = true;
+                text = new List<string>() { npcTalkSystem.textOnGift };
+                HaronLibrary.ChangeGiftState(npcTalkSystem.giftId);
             }
             else
             {
-                if (isReapiting)
-                {
-                    currentTextNumber = 0;
-                    player.GetComponent<PlayerTalk>().ResetDialog(npcName);
-                }
-                talker.CloseWindow();
+                text = npcTalkSystem.notGiftedText;
             }
+        }
+        else
+        {
+            text = npcTalkSystem.giftedText;
         }
     }
 
@@ -66,8 +82,8 @@ public class NPC : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            ChangeHelperState();
             player = collision.gameObject;
+            ChangeHelperState();
         }
     }
 
@@ -75,11 +91,11 @@ public class NPC : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            ChangeHelperState();
-            currentTextNumber = 0;
-            talker.ImmidiatlyCloseWindow();
-            player.GetComponent<PlayerTalk>().ResetDialog(npcName);
+            isStartDialog = true;
             player = null;
+            ChangeHelperState();
+            talker.CloseWindow();
+            currentTextNumber = 0;
         }
     }
 

@@ -10,60 +10,42 @@ public class Talker : MonoBehaviour
     [SerializeField]
     private Image image;
     [SerializeField]
-    private float textDelay = 0.2f;
+    private float textDelay = 0.05f;
     [SerializeField]
     private GameObject talkingSection;
+    
 
-    private List<Sprite> spriteTalkerQueue;
-    private List<string> talkQueue;
-    private bool talking = false;
-
-    private bool windowState = false;
+    private bool canTalk = true;
     // Start is called before the first frame update
     void Start()
     {
-        talkQueue = new List<string>();
-        spriteTalkerQueue = new List<Sprite>();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void WriteText(string text, Sprite talkerSprite)
     {
-        windowState = true;
         talkingSection.SetActive(true);
-        if (talking)
-        {
-            talkQueue.Add(text);
-            spriteTalkerQueue.Add(talkerSprite);
-        }
-        else
-        {
-            image.sprite = talkerSprite;
-            talking = true;
-            StartCoroutine(SlowTextWriter(text));
-        }
-        
+        canTalk = false;
+        image.sprite = talkerSprite;
+        StartCoroutine(SlowTextWriter(text));
+    }
+
+    public bool CanWriteText()
+    {
+        return canTalk;
     }
 
     public void CloseWindow()
     {
-        windowState = false;
-        if(!talking)
-            talkingSection.SetActive(false);
-    }
-
-    public void ImmidiatlyCloseWindow()
-    {
-        windowState = false;
-        talkQueue.Clear();
-        spriteTalkerQueue.Clear();
-        talkingSection.SetActive(false);
+        canTalk = true;
         StopAllCoroutines();
+        talkingSection.SetActive(false);
     }
 
     private IEnumerator SlowTextWriter(string text)
@@ -74,20 +56,6 @@ public class Talker : MonoBehaviour
             yield return new WaitForSeconds(textDelay);
             textField.text += letter;
         }
-        talking = false;
-        if(talkQueue.Count > 0)
-        {
-            yield return new WaitForSeconds(3);
-            string talkText = talkQueue[0];
-            Sprite talkerSprite = spriteTalkerQueue[0];
-            talkQueue.RemoveAt(0);
-            spriteTalkerQueue.RemoveAt(0);
-            WriteText(talkText, talkerSprite);
-        }
-        else
-        {
-            if (!windowState)
-                talkingSection.SetActive(false);
-        }
+        canTalk = true;
     }
 }

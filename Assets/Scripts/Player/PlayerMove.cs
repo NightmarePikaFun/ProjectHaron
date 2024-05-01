@@ -17,8 +17,11 @@ public class PlayerMove : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        speedX = Input.GetAxis("Horizontal");
-        speedY = Input.GetAxis("Vertical");
-        rb.velocity = new Vector2(speedX, speedY).normalized*speed;
+        if (HaronLibrary.playerCanMove)
+        {
+            speedX = Input.GetAxis("Horizontal");
+            speedY = Input.GetAxis("Vertical");
+            rb.velocity = new Vector2(speedX, speedY).normalized * speed;
+        }
     }
 }

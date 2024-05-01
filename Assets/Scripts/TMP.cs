@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TMP : MonoBehaviour
 {
+    //TODO перенести в HaronLibrary
     [SerializeField]
     private bool change = false;
     [SerializeField, Range(0, 1.2f)]
@@ -17,7 +20,15 @@ public class TMP : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(change)
+        if(Input.GetKeyDown(KeyCode.H))
+        {
+            SceneManager.LoadScene("Styx");
+        }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            SceneManager.LoadScene("Tavern");
+        }
+        if (change)
         {
             Observer.GameSpeed = gameSpeed;
         }
